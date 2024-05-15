@@ -14,12 +14,9 @@ class UserService{
         }
     }
 
-    static async register(userData, token){
+    static async register(userData){
         try{
-            const response = await axios.post(`${UserService.BASE_URL}/auth/register`, userData, 
-            {
-                headers: {Authorization: `Bearer ${token}`}
-            })
+            const response = await axios.post(`${UserService.BASE_URL}/auth/register`, userData)
             return response.data;
         }catch(err){
             throw err;
@@ -54,31 +51,6 @@ class UserService{
     static async getUserById(userId, token){
         try{
             const response = await axios.get(`${UserService.BASE_URL}/admin/get-users/${userId}`, 
-            {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            return response.data;
-        }catch(err){
-            throw err;
-        }
-    }
-
-    static async deleteUser(userId, token){
-        try{
-            const response = await axios.delete(`${UserService.BASE_URL}/admin/delete/${userId}`, 
-            {
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            return response.data;
-        }catch(err){
-            throw err;
-        }
-    }
-
-
-    static async updateUser(userId, userData, token){
-        try{
-            const response = await axios.put(`${UserService.BASE_URL}/admin/update/${userId}`, userData,
             {
                 headers: {Authorization: `Bearer ${token}`}
             })

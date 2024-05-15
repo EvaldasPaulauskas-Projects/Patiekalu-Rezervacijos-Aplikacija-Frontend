@@ -9,7 +9,7 @@ function RegistrationPage() {
         email: '',
         username: '',
         password: '',
-        role: '',
+        role: 'USER', // Default role to 'USER'
     });
 
     const handleInputChange = (e) => {
@@ -21,19 +21,20 @@ function RegistrationPage() {
         e.preventDefault();
         try {
             // Call the register method from UserService
-            console.log(formData);
             const token = localStorage.getItem('token');
-            await UserService.register(formData, token);
+
+            console.log(formData);
+            await UserService.register(formData, token); 
 
             // Clear the form fields after successful registration
             setFormData({
                 email: '',
-                username: '', // Reset username field
+                username: '',
                 password: '',
-                role: 'USER', // Reset role field to 'ADMIN'
+                role: 'USER',
             });
             alert('User registered successfully');
-            navigate('/admin/user-management');
+            navigate('/dashboard');
         } catch (error) {
             console.error('Error registering user:', error);
             alert('An error occurred while registering user');
@@ -49,17 +50,14 @@ function RegistrationPage() {
                     <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
-                    <label>Username:</label> {/* Changed label to 'Username' */}
-                    <input type="text" name="username" value={formData.username} onChange={handleInputChange} required /> {/* Changed name to 'username' */}
+                    <label>Username:</label>
+                    <input type="text" name="username" value={formData.username} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                     <label>Password:</label>
                     <input type="password" name="password" value={formData.password} onChange={handleInputChange} required />
                 </div>
-                <div className="form-group">
-                    <label>Role:</label>
-                    <input type="text" name="role" value={formData.role} onChange={handleInputChange} placeholder="Enter your role" required />
-                </div>
+                {/* Remove the Role input field */}
                 <button type="submit">Register</button>
             </form>
         </div>
