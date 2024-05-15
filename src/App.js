@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import UserService from "./service/UserService";
+import LoginPage from './pages/auth/LoginPage';
+import Dashboard from './pages/Dashboard';
+import Navbar from './components/Navbar/Navbar';
+import RegistrationPage from './pages/auth/RegistrationPage';
+import AddFood from './service/food/AddFood';
+import Food from './pages/Food';
+import EditFood from './service/food/EditFood';
 
 function App() {
+  const isAuthenticated = UserService.isAuthenticated();
+  const isAdmin = UserService.isAdmin();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        {/* Public Routes */}
+        {!isAuthenticated ? (
+          <>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/register" element={<RegistrationPage />} />
+          </>
+        ) : (
+          <>
+            {/* Authenticated User Routes */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/food" element={<Food />} />
+
+            {/* Admin Routes */}
+            {isAdmin && (
+              <>
+                <Route path="/add-food" element={<AddFood />} />
+                <Route path="/edit-food/:id" element={<EditFood />} />
+              </>
+            )}
+          </>
+        )}
+      </Routes>
+    </BrowserRouter>
   );
 }
 
