@@ -23,7 +23,7 @@ export default function AddFood() {
   const onSubmit = async (e) => {
     e.preventDefault();
     await axios.post("http://localhost:8080/food", food);
-    navigate("/");
+    navigate("/dashboard");
   };
 
   return (

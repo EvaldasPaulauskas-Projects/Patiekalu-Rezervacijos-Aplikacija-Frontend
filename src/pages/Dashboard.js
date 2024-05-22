@@ -3,6 +3,7 @@ import UserService from '../service/UserService';
 
 export default function Dashboard() {
   const [profileInfo, setProfileInfo] = useState({});
+  const [reservations, setReservations] = useState([]);
 
   useEffect(() => {
     fetchProfileInfo();
@@ -11,10 +12,23 @@ export default function Dashboard() {
   const fetchProfileInfo = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await UserService.getYourProfile(token);
-      setProfileInfo(response.ourUsers);
+      const profileResponse = await UserService.getYourProfile(token);
+      setProfileInfo(profileResponse.ourUsers);
+
+      const reservationsResponse = await UserService.getReservationsByUserId(profileResponse.ourUsers.id, token);
+      setReservations(reservationsResponse);
     } catch (error) {
       console.error('Error fetching profile information:', error);
+    }
+  };
+
+  const handleUnreserve = async (reservationId) => {
+    try {
+      const token = localStorage.getItem('token');
+      await UserService.deleteReservationById(reservationId, token);
+      setReservations(reservations.filter(reservation => reservation.id !== reservationId));
+    } catch (error) {
+      console.error('Error deleting reservation:', error);
     }
   };
 
@@ -44,7 +58,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Table for profile information */}
+      {/* Table for reservations */}
+      <h1 className='text-2xl font-bold ml-4'>Reserved Foods :</h1>
       <div className="w-full overflow-x-auto">
         <table className="table-auto border shadow-lg bg-white w-full">
           <thead className="bg-gray-200">
@@ -60,18 +75,33 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            <tr>
-              <td className="border px-4 py-2">NULL</td>
-              <td className="border px-4 py-2">NULL</td>
-              <td className="border px-4 py-2">NULL</td>
-              <td className="border px-4 py-2">NULL</td>
-              <td className="border px-4 py-2">
-                <img className="max-w-xs" />
-              </td>
-              <td className="border px-4 py-2">NULL</td>
-              <td className="border px-4 py-2">NULL</td>
-              <td className="border px-4 py-2">Action Button</td>
-            </tr>
+            {reservations.length > 0 ? (
+              reservations.map((reservation, index) => (
+                <tr key={reservation.id}>
+                  <td className="border px-4 py-2">{index + 1}</td>
+                  <td className="border px-4 py-2">{reservation.pavadinimas}</td>
+                  <td className="border px-4 py-2">{reservation.aprasymas}</td>
+                  <td className="border px-4 py-2">{reservation.kaina}</td>
+                  <td className="border px-4 py-2">
+                    <img className="max-w-xs" src={reservation.nuotrauka} alt="Reservation" />
+                  </td>
+                  <td className="border px-4 py-2">{reservation.kiekis}</td>
+                  <td className="border px-4 py-2">{reservation.kategorija}</td>
+                  <td className="border px-4 py-2 flex items-center justify-center">
+                    <button 
+                      className="btn mx-2 py-1 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white"
+                      onClick={() => handleUnreserve(reservation.id)}
+                    >
+                      Unreserve
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" className="border px-4 py-2 text-center">No reservations found</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserService from "../../service/UserService";
+
 function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
@@ -44,7 +45,6 @@ function LoginPage() {
     <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-400 to-purple-600">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <h2 className="text-3xl text-center font-bold text-gray-800 mb-6">Login</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-800">Email:</label>
@@ -65,6 +65,7 @@ function LoginPage() {
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
             />
+            {error && <p className="text-red-500 mt-2">{error}</p>} {/* Moved error display here */}
           </div>
           <button
             type="submit"
@@ -73,6 +74,9 @@ function LoginPage() {
             Login
           </button>
         </form>
+        <div className="mt-4 text-center">
+          <p>Don't have an account? <a href="/register" className="text-blue-500 hover:underline">Register here</a>.</p>
+        </div>
       </div>
     </div>
   );

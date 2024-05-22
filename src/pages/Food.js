@@ -6,7 +6,6 @@ import UserService from "../service/UserService";
 export default function Food() {
   const [foods, setFoods] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const isAdmin = UserService.isAdmin();
 
   useEffect(() => {
     loadFoods();
@@ -22,6 +21,48 @@ export default function Food() {
     loadFoods();
   };
 
+  const reserveFood = async (foodId, pavadinimas, aprasymas, kaina, nuotrauka, kiekis, kategorija) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("User not authenticated. Please log in.");
+      }
+  
+      const userProfileResponse = await UserService.getYourProfile(token);
+      const userProfile = userProfileResponse.ourUsers;
+  
+      if (!userProfile || !userProfile.id) {
+        throw new Error("User ID not found in user profile.");
+      }
+  
+      const userId = userProfile.id;
+  
+      const reservationData = {
+        foodId,
+        pavadinimas,
+        aprasymas,
+        kaina,
+        nuotrauka,
+        kiekis : 1,
+        kategorija,
+        user_id: userId,
+      };
+  
+      console.log(reservationData);
+  
+      const response = await axios.post('http://localhost:8080/reserve', reservationData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      console.log(response.data);
+      alert("Food reserved successfully!!!!");
+  
+    } catch (error) {
+      console.error("There was an error reserving the food!", error);
+      alert("Failed to reserve food.");
+    }
+  };
+  
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -68,7 +109,14 @@ export default function Food() {
                 <td className="border px-4 py-2">{food.kiekis}</td>
                 <td className="border px-4 py-2">{food.kategorija}</td>
                 <td className="border px-4 py-2 flex justify-center">
-                  {isAdmin ? (
+                  <button
+                    className={`btn mx-2 py-1 px-4 rounded-xl ${food.kiekis === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600'} text-white`}
+                    onClick={() => reserveFood(food.id, food.pavadinimas, food.aprasymas, food.kaina, food.nuotrauka, food.kiekis, food.kategorija)}
+                    disabled={food.kiekis === 0}
+                  >
+                    {food.kiekis === 0 ? 'Out of Stock' : 'Reserve'}
+                  </button>
+                  {UserService.isAdmin() && (
                     <>
                       <Link className="btn btn-outline-primary mx-2 py-1 px-4 rounded-xl border border-blue-500 hover:border-blue-600 text-blue-500" to={`/edit-food/${food.id}`}>
                         Edit
@@ -77,10 +125,6 @@ export default function Food() {
                         Delete
                       </button>
                     </>
-                  ) : (
-                    <button className="btn mx-2 py-1 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white">
-                        Reserve
-                    </button>
                   )}
                 </td>
               </tr>
