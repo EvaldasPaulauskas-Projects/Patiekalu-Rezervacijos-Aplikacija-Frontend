@@ -64,8 +64,7 @@ The PatiekaluRezervacijosAplikacija Frontend is a user interface for managing fo
     ```json
     {
       "username": "user@example.com",
-      "password": "yourpassword",
-      "confirmPassword": "yourpassword"
+      "password": "yourpassword"
     }
     ```
   - Response: 
